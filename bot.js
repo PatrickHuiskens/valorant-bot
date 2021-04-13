@@ -84,6 +84,7 @@ function getPlayerMMR(playerId, msg) {
     // get player mmr
     valorantApi.getPlayerMMR(playerId).then((response) => {
         if(response.data.LatestCompetitiveUpdate){
+            console.log(response.data.LatestCompetitiveUpdate);
             const update = response.data.LatestCompetitiveUpdate;
             var elo = calculateElo(update.TierAfterUpdate, update.RankedRatingAfterUpdate);
             console.log(`Current Tier: ${update.TierAfterUpdate} (${Valorant.Tiers[update.TierAfterUpdate]})`);
