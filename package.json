@@ -1,0 +1,17 @@
+{
+  "name": "valobot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@liamcottle/valorant.js": "^1.2.0",
+    "dotenv": "^8.2.0",
+    "request": "^2.88.2"
+  }
+}
