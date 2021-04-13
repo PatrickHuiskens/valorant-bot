@@ -28,7 +28,7 @@ valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then((
 
 function getPlayerMMR(playerId) {
     // get player mmr
-    valorantApi.getPlayerMMR(uniqueUserId).then((response) => {
+    valorantApi.getPlayerMMR(playerId).then((response) => {
         if(response.data.LatestCompetitiveUpdate){
             const update = response.data.LatestCompetitiveUpdate;
             var elo = calculateElo(update.TierAfterUpdate, update.RankedRatingAfterUpdate);
