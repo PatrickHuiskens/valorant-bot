@@ -16,7 +16,7 @@ db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant 
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
-    client.user.setActivity(`playing icebox`);
+    client.user.setActivity(`icebox`);
 });
 
 let userParts
