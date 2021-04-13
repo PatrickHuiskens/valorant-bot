@@ -20,42 +20,89 @@ client.on('ready', () => {
 });
 
 let userParts
-let uniqueUserId
 
+client.on('message', msg => {
+    if (msg.author.bot) {
+        return;
+    }
 
+    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + 9) === process.env.COMMAND_PREFIX + ' username') {
+        let valorantTag = msg.content.substr(process.env.COMMAND_PREFIX.length + 10);
+        let discordId = msg.author.id;
 
-valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
+        db.get("SELECT id_discord FROM users WHERE id_discord = ?", [discordId], (err, row) => {
+            // process the row here
+            if (typeof row !== 'undefined') {
+                return msg.channel.send("Your Discord user has already been connected to a Valorant account.");
+            }
+        });
 
-    name = 'ptk#1407';
-    userParts = name.split('#');
+        setValorantTag(valorantTag, discordId);
+    }
 
-    request('https://api.henrikdev.xyz/valorant/v1/puuid/'+userParts[0]+'/'+userParts[1], function (error, response, body) {
-        if (response.statusCode === 200) {
-            uniqueUserId = JSON.parse(body).data.puuid;
-            getPlayerMMR(uniqueUserId);
-        } else {
-            return;
-        }
-    });
-}).catch((error) => {
-    console.log(error);
-    return;
+    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + 5) === process.env.COMMAND_PREFIX + ' rank') {
+        let discordId = msg.author.id;
+
+        db.get("SELECT id_discord, id_valorant FROM users WHERE id_discord = ?", [discordId], (err, row) => {
+            // process the row here
+            if (typeof row === 'undefined') {
+                return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} username`);
+            }
+
+            valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
+                getPlayerMMR(row.id_valorant, msg);
+            })
+        });
+    }
 })
 
-function getPlayerMMR(playerId) {
+// rename functions to set username, instead of authorize
+function setValorantTag(valorantTag, discordId) {
+    valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
+
+        name = valorantTag;
+        userParts = name.split('#');
+
+        request('https://api.henrikdev.xyz/valorant/v1/puuid/'+userParts[0]+'/'+userParts[1], function (error, response, body) {
+            if (response.statusCode === 200) {
+                let valorantId = JSON.parse(body).data.puuid;
+
+                var stmt = db.prepare("INSERT INTO users VALUES (?, ?, ?)");
+                stmt.run(discordId, valorantId, new Date().getTime());
+                stmt.finalize();
+            } else {
+                return;
+            }
+        });
+    }).catch((error) => {
+        console.log(error);
+        return;
+    })
+}
+
+function getPlayerMMR(playerId, msg) {
     // get player mmr
     valorantApi.getPlayerMMR(playerId).then((response) => {
         if(response.data.LatestCompetitiveUpdate){
             const update = response.data.LatestCompetitiveUpdate;
             var elo = calculateElo(update.TierAfterUpdate, update.RankedRatingAfterUpdate);
-            console.log(`Movement: ${update.CompetitiveMovement}`);
             console.log(`Current Tier: ${update.TierAfterUpdate} (${Valorant.Tiers[update.TierAfterUpdate]})`);
             console.log(`Current Tier Progress: ${update.RankedRatingAfterUpdate}/100`);
             console.log(`Total Elo: ${elo}`);
+
+            let rankEmbed = new Discord.MessageEmbed()
+                .addField('Current Tier:', `${Valorant.Tiers[update.TierAfterUpdate]}`)
+                .addField('Current Tier Progress: ', `${update.RankedRatingAfterUpdate}/100`)
+                .addField('Total Elo: ', `${elo}`)
+
+            return msg.channel.send(rankEmbed);
         } else {
             console.log("No competitive update available. Have you played a competitive match yet?");
         }
 
+    }).catch((error) => {
+        console.log(error);
+        return;
     });
 }
 
@@ -66,3 +113,5 @@ function calculateElo(tier, progress) {
         return ((tier * 100) - 300) + progress;
     }
 }
+
+client.login(process.env.DISCORD_TOKEN);
