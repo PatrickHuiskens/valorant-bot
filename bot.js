@@ -1,11 +1,27 @@
 require('dotenv').config()
 
+// init disc
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
+// init valo stuff
 const Valorant = require('@liamcottle/valorant.js')
 const valorantApi = new Valorant.API(Valorant.Regions.Europe)
 const request = require('request')
 
+const sqlite3 = require('sqlite3').verbose();
+
+var db = new sqlite3.Database('valobot.db');
+db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, date_time TEXT NOT NULL UNIQUE);");
+
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}`);
+    client.user.setActivity(`playing icebox`);
+});
+
 let userParts
 let uniqueUserId
+
 
 
 valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
