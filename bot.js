@@ -51,11 +51,7 @@ client.on('message', msg => {
         db.get("SELECT id_discord, id_valorant FROM users WHERE id_discord = ?", [discordId], (err, row) => {
             // process the row here
             if (typeof row === 'undefined') {
-<<<<<<< HEAD
-                return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} ${usernameCommand} [username]`);
-=======
                 return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} username [name#tag]`);
->>>>>>> bb6fe9c33b34abc03eaab1a98351baf72d71b02e
             }
 
             valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
