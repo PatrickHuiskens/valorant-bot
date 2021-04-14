@@ -15,7 +15,7 @@ const request = require('request')
 const sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database('valobot.db');
-db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, prev_rank TEXT NULL, date_time TEXT NOT NULL UNIQUE);");
+db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, highest_rank TEXT NULL, date_time TEXT NOT NULL UNIQUE);");
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
