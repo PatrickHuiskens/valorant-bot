@@ -11,9 +11,7 @@ module.exports = {
                         response.data.Matches.every(element => {
                             if(element.TierAfterUpdate != 0) {
                                 if(element.TierAfterUpdate > row.highest_rank) {
-                                    console.log(row.highest_rank);
-                                    console.log(element.TierAfterUpdate);
-                                    insertRankInDB(row.highest_rank, row.id_discord);
+                                    insertRankInDB(element.TierAfterUpdate, row.id_discord);
                                 }
                                 return false;
                             }

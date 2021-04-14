@@ -39,7 +39,7 @@ client.on('ready', () => {
     setInterval(function () {
         Update.updateRankInDB();
         Update.updateRoleInDiscord();
-     }, 60* 60 * 10000);
+     }, 60 * 60 * 1000);
 });
 
 client.on('message', msg => {
