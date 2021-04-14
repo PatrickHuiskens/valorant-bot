@@ -21,7 +21,7 @@ var Tiers =  {
     19: "Diamond 2",
     20: "Diamond 3",
     21: "Immortal",
-    22: "Radiant",
+    24: "Radiant",
 }
 
 module.exports = Tiers;

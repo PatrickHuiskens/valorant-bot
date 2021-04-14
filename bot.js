@@ -70,7 +70,7 @@ function setValorantTag(valorantTag, discordId, msg) {
             if (response.statusCode === 200) {
                 let valorantId = JSON.parse(body).data.puuid;
 
-                var stmt = db.prepare("INSERT INTO users VALUES (?, ?, ?)");
+                var stmt = db.prepare("INSERT INTO users VALUES (?, ?, NULL, ?)");
                 stmt.run(discordId, valorantId, new Date().getTime());
                 stmt.finalize();
 
@@ -107,13 +107,15 @@ function getPlayerMMR(playerId, msg) {
     });
 }
 
-function sendRank(element, msg) {
-    var elo = calculateElo(element.TierAfterUpdate, element.RankedRatingAfterUpdate);
-        
+function sendRank(element, msg) {        
     let rankEmbed = new Discord.MessageEmbed()
-        .addField('Current Tier:', `${Tiers[element.TierAfterUpdate]}`)
-        .addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
-        .addField('Total Elo: ', `${elo}`)
+        .addField('Current Tier:', `${Tiers[element.TierAfterUpdate]}`);
+    
+    if(element.TierAfterUpdate >= 21){
+        rankEmbed.addField('Current Rating: ', `${element.RankedRatingAfterUpdate}`)
+    } else {
+        rankEmbed.addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
+    }
 
     if(element.TierAfterUpdate > 2) {
         let attachment = new Discord.MessageAttachment(`./resources/ranks/${element.TierAfterUpdate}.png`, 'rank.png');
@@ -122,14 +124,6 @@ function sendRank(element, msg) {
     }
 
     msg.channel.send(rankEmbed);
-}
-
-function calculateElo(tier, progress) {
-    if(tier >= 21) {
-        return 1800 + progress
-    } else {
-        return ((tier * 100) - 300) + progress;
-    }
 }
 
 client.login(process.env.DISCORD_TOKEN);
