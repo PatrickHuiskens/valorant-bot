@@ -21,7 +21,8 @@ const valorantApi = new Valorant.API(Valorant.Regions.Europe)
 
 // init db
 const db = new sqlite3.Database('valobot.db');
-db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, highest_rank TEXT NULL, date_time TEXT NOT NULL UNIQUE);");
+db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, highest_rank TEXT NULL, date_time TEXT NOT NULL);");
+db.run("CREATE TABLE IF NOT EXISTS servers (id_server TEXT NOT NULL UNIQUE);");
 
 // init env variables
 const env = process.env;
@@ -36,8 +37,9 @@ client.on('ready', () => {
     client.user.setActivity(`icebox`);
 
     setInterval(function () {
-        Update.execute();
-     }, 60 * 60 * 1000);
+        Update.updateRankInDB();
+        Update.updateRoleInDiscord();
+     }, 60* 60 * 10000);
 });
 
 client.on('message', msg => {
