@@ -81,26 +81,26 @@ function setValorantTag(valorantTag, discordId) {
 }
 
 function getPlayerMMR(playerId, msg) {
-    // get player mmr
-    valorantApi.getPlayerMMR(playerId).then((response) => {
-        if(response.data.LatestCompetitiveUpdate){
-            console.log(response.data.LatestCompetitiveUpdate);
-            const update = response.data.LatestCompetitiveUpdate;
-            var elo = calculateElo(update.TierAfterUpdate, update.RankedRatingAfterUpdate);
-            console.log(`Current Tier: ${update.TierAfterUpdate} (${Valorant.Tiers[update.TierAfterUpdate]})`);
-            console.log(`Current Tier Progress: ${update.RankedRatingAfterUpdate}/100`);
-            console.log(`Total Elo: ${elo}`);
+    valorantApi.getPlayerCompetitiveHistory(playerId, 0, 20).then((response) => {
+        response.data.Matches.every(element => {
+            if(element.TierAfterUpdate != 0){
+                var elo = calculateElo(element.TierAfterUpdate, element.RankedRatingAfterUpdate);
+                console.log(`Current Tier: ${element.TierAfterUpdate} (${Valorant.Tiers[element.TierAfterUpdate]})`);
+                console.log(`Current Tier Progress: ${element.RankedRatingAfterUpdate}/100`);
+                console.log(`Total Elo: ${elo}`);
+        
+                let rankEmbed = new Discord.MessageEmbed()
+                    .addField('Current Tier:', `${Valorant.Tiers[element.TierAfterUpdate]}`)
+                    .addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
+                    .addField('Total Elo: ', `${elo}`)
+    
+                msg.channel.send(rankEmbed);
+                return false;
+            }
+            return true;
+        });
 
-            let rankEmbed = new Discord.MessageEmbed()
-                .addField('Current Tier:', `${Valorant.Tiers[update.TierAfterUpdate]}`)
-                .addField('Current Tier Progress: ', `${update.RankedRatingAfterUpdate}/100`)
-                .addField('Total Elo: ', `${elo}`)
-
-            return msg.channel.send(rankEmbed);
-        } else {
-            console.log("No competitive update available. Have you played a competitive match yet?");
-        }
-
+        console.log("No competitive match found. Have you played a competitive match recently?");
     }).catch((error) => {
         console.log(error);
         return;
