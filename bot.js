@@ -29,8 +29,9 @@ client.on('message', msg => {
         return;
     }
 
-    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + 9) === process.env.COMMAND_PREFIX + ' username') {
-        let valorantTag = msg.content.substr(process.env.COMMAND_PREFIX.length + 10);
+    let usernameCommand = ' username';
+    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + usernameCommand.length) === process.env.COMMAND_PREFIX + usernameCommand) {
+        let valorantTag = msg.content.substr(process.env.COMMAND_PREFIX.length + usernameCommand.length + 1);
         let discordId = msg.author.id;
 
         db.get("SELECT id_discord FROM users WHERE id_discord = ?", [discordId], (err, row) => {
@@ -43,7 +44,8 @@ client.on('message', msg => {
         setValorantTag(valorantTag, discordId, msg);
     }
 
-    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + 5) === process.env.COMMAND_PREFIX + ' rank') {
+    let rankCommand = ' rank';
+    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + rankCommand.length) === process.env.COMMAND_PREFIX + rankCommand) {
         let discordId = msg.author.id;
 
         db.get("SELECT id_discord, id_valorant FROM users WHERE id_discord = ?", [discordId], (err, row) => {
@@ -66,7 +68,7 @@ function setValorantTag(valorantTag, discordId, msg) {
         name = valorantTag;
         userParts = name.split('#');
 
-        request('https://api.henrikdev.xyz/valorant/v1/puuid/'+userParts[0]+'/'+userParts[1], function (error, response, body) {
+        request('https://api.henrikdev.xyz/valorant/v1/puuid/' + userParts[0] + '/' + userParts[1], function (error, response, body) {
             if (response.statusCode === 200) {
                 let valorantId = JSON.parse(body).data.puuid;
 
@@ -120,7 +122,7 @@ function sendRank(element, msg) {
     if(element.TierAfterUpdate > 2) {
         let attachment = new Discord.MessageAttachment(`./resources/ranks/${element.TierAfterUpdate}.png`, 'rank.png');
         rankEmbed.attachFiles(attachment)
-                 .setImage('attachment://rank.png');
+                 .setThumbnail('attachment://rank.png');
     }
 
     msg.channel.send(rankEmbed);
