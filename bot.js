@@ -41,14 +41,7 @@ client.on('message', msg => {
     const args = StringUtil.splitAtFirstSpace(msg.content.slice(env.COMMAND_PREFIX.length + 1));
     const command = args.shift().toLowerCase();
 
-    // Maybe clean-up using a map?
-    if(command === 'link'){
-        client.commands.get('link').execute(msg, args);
-    } else if (command === 'rank'){
-        client.commands.get('rank').execute(msg, args);
-    } else if(command === 'unlink'){
-        client.commands.get('unlink').execute(msg, args);
-    }
+    client.commands.get(command).execute(msg, args);
 })
 
 client.login(env.DISCORD_TOKEN);
