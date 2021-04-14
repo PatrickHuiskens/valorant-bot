@@ -1,5 +1,8 @@
 require('dotenv').config()
 
+// init static list
+const Tiers = require('./tiers.js');
+
 // init disc
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -12,7 +15,7 @@ const request = require('request')
 const sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database('valobot.db');
-db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, date_time TEXT NOT NULL UNIQUE);");
+db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, prev_rank TEXT NULL, date_time TEXT NOT NULL UNIQUE);");
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -84,25 +87,30 @@ function setValorantTag(valorantTag, discordId, msg) {
 
 function getPlayerMMR(playerId, msg) {
     valorantApi.getPlayerCompetitiveHistory(playerId, 0, 20).then((response) => {
+        let rankFound = false;
+
         response.data.Matches.every(element => {
             if(element.TierAfterUpdate != 0){
                 var elo = calculateElo(element.TierAfterUpdate, element.RankedRatingAfterUpdate);
-                console.log(`Current Tier: ${element.TierAfterUpdate} (${Valorant.Tiers[element.TierAfterUpdate]})`);
-                console.log(`Current Tier Progress: ${element.RankedRatingAfterUpdate}/100`);
-                console.log(`Total Elo: ${elo}`);
         
+                let attachment = new Discord.MessageAttachment(`./resources/ranks/${element.TierAfterUpdate}.png`, 'rank.png');
                 let rankEmbed = new Discord.MessageEmbed()
-                    .addField('Current Tier:', `${Valorant.Tiers[element.TierAfterUpdate]}`)
+                    .addField('Current Tier:', `${Tiers[element.TierAfterUpdate]}`)
                     .addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
                     .addField('Total Elo: ', `${elo}`)
+                    .attachFiles(attachment)
+                    .setImage('attachment://rank.png');
     
                 msg.channel.send(rankEmbed);
+                rankFound = true;
                 return false;
             }
             return true;
         });
 
-        console.log("No competitive match found. Have you played a competitive match recently?");
+        if(!rankFound){
+            console.log("No competitive match found. Have you played a competitive match recently?");
+        }
     }).catch((error) => {
         console.log(error);
         return;
