@@ -51,12 +51,25 @@ client.on('message', msg => {
         db.get("SELECT id_discord, id_valorant FROM users WHERE id_discord = ?", [discordId], (err, row) => {
             // process the row here
             if (typeof row === 'undefined') {
+<<<<<<< HEAD
                 return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} ${usernameCommand} [username]`);
+=======
+                return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} username [name#tag]`);
+>>>>>>> bb6fe9c33b34abc03eaab1a98351baf72d71b02e
             }
 
             valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
                 getPlayerMMR(row.id_valorant, msg);
             })
+        });
+    }
+
+    let unlinkCommand = ' unlink';
+    if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + unlinkCommand.length) === process.env.COMMAND_PREFIX + unlinkCommand) {
+        let discordId = msg.author.id;
+
+        db.get("DELETE FROM users WHERE id_discord = ?", [discordId], (err, row) => {
+            return msg.channel.send(`Your account has been unlinked`);
         });
     }
 })
