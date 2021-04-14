@@ -22,8 +22,6 @@ client.on('ready', () => {
     client.user.setActivity(`icebox`);
 });
 
-let userParts
-
 client.on('message', msg => {
     if (msg.author.bot) {
         return;
@@ -51,7 +49,7 @@ client.on('message', msg => {
         db.get("SELECT id_discord, id_valorant FROM users WHERE id_discord = ?", [discordId], (err, row) => {
             // process the row here
             if (typeof row === 'undefined') {
-                return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX} username [name#tag]`);
+                return msg.channel.send(`Please add a Valorant account by using ${process.env.COMMAND_PREFIX}${usernameCommand} [name#tag]`);
             }
 
             valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
@@ -74,8 +72,8 @@ client.on('message', msg => {
 function setValorantTag(valorantTag, discordId, msg) {
     valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
 
-        name = valorantTag;
-        userParts = name.split('#');
+        let name = valorantTag;
+        let userParts = name.split('#');
 
         request('https://api.henrikdev.xyz/valorant/v1/puuid/' + userParts[0] + '/' + userParts[1], function (error, response, body) {
             if (response.statusCode === 200) {
