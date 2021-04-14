@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const Valorant = require('@liamcottle/valorant.js')
 const sqlite3 = require('sqlite3').verbose();
 const StringUtil = require('./utils/string.js');
-const Update = require('./update.js');
+const Update = require('./code/update.js');
 
 // init disc
 const client = new Discord.Client();
