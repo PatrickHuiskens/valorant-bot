@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 const Valorant = require('@liamcottle/valorant.js')
 const sqlite3 = require('sqlite3').verbose();
 const StringUtil = require('./utils/string.js');
+const Update = require('./update.js');
 
 // init disc
 const client = new Discord.Client();
@@ -33,6 +34,10 @@ module.exports.env = env;
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
     client.user.setActivity(`icebox`);
+
+    setInterval(function () {
+        Update.execute();
+     }, 60 * 60 * 1000);
 });
 
 client.on('message', msg => {
