@@ -90,31 +90,38 @@ function getPlayerMMR(playerId, msg) {
         let rankFound = false;
 
         response.data.Matches.every(element => {
-            if(element.TierAfterUpdate != 0){
-                var elo = calculateElo(element.TierAfterUpdate, element.RankedRatingAfterUpdate);
-        
-                let attachment = new Discord.MessageAttachment(`./resources/ranks/${element.TierAfterUpdate}.png`, 'rank.png');
-                let rankEmbed = new Discord.MessageEmbed()
-                    .addField('Current Tier:', `${Tiers[element.TierAfterUpdate]}`)
-                    .addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
-                    .addField('Total Elo: ', `${elo}`)
-                    .attachFiles(attachment)
-                    .setImage('attachment://rank.png');
-    
-                msg.channel.send(rankEmbed);
+            if(element.TierAfterUpdate != 0) {
+                sendRank(element, msg);
                 rankFound = true;
                 return false;
             }
             return true;
         });
 
-        if(!rankFound){
+        if(!rankFound) {
             console.log("No competitive match found. Have you played a competitive match recently?");
         }
     }).catch((error) => {
         console.log(error);
         return;
     });
+}
+
+function sendRank(element, msg) {
+    var elo = calculateElo(element.TierAfterUpdate, element.RankedRatingAfterUpdate);
+        
+    let rankEmbed = new Discord.MessageEmbed()
+        .addField('Current Tier:', `${Tiers[element.TierAfterUpdate]}`)
+        .addField('Current Tier Progress: ', `${element.RankedRatingAfterUpdate}/100`)
+        .addField('Total Elo: ', `${elo}`)
+
+    if(element.TierAfterUpdate > 2) {
+        let attachment = new Discord.MessageAttachment(`./resources/ranks/${element.TierAfterUpdate}.png`, 'rank.png');
+        rankEmbed.attachFiles(attachment)
+                 .setImage('attachment://rank.png');
+    }
+
+    msg.channel.send(rankEmbed);
 }
 
 function calculateElo(tier, progress) {
