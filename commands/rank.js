@@ -1,6 +1,6 @@
 const Bot = require('../bot.js');
 const Discord = require('discord.js');
-const Tiers = require('../utils/tiers.js');
+const Tiers = require('../model/tiers.js');
 
 module.exports = {
     name: 'rank',
