@@ -37,7 +37,7 @@ client.on('message', msg => {
             }
         });
 
-        setValorantTag(valorantTag, discordId);
+        setValorantTag(valorantTag, discordId, msg);
     }
 
     if(msg.content.substr(0, process.env.COMMAND_PREFIX.length + 5) === process.env.COMMAND_PREFIX + ' rank') {
@@ -57,7 +57,7 @@ client.on('message', msg => {
 })
 
 // rename functions to set username, instead of authorize
-function setValorantTag(valorantTag, discordId) {
+function setValorantTag(valorantTag, discordId, msg) {
     valorantApi.authorize(process.env.API_USERNAME, process.env.API_PASSWORD).then(() => {
 
         name = valorantTag;
@@ -70,6 +70,8 @@ function setValorantTag(valorantTag, discordId) {
                 var stmt = db.prepare("INSERT INTO users VALUES (?, ?, ?)");
                 stmt.run(discordId, valorantId, new Date().getTime());
                 stmt.finalize();
+
+                return msg.channel.send('You are succesfully connected to your Valorant account.');
             } else {
                 return;
             }
