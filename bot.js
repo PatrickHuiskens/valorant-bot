@@ -5,7 +5,6 @@ const Discord = require('discord.js');
 const Valorant = require('@liamcottle/valorant.js')
 const sqlite3 = require('sqlite3').verbose();
 const StringUtil = require('./utils/string.js');
-const Update = require('./code/update.js');
 
 // init disc
 const client = new Discord.Client();
@@ -22,7 +21,6 @@ const valorantApi = new Valorant.API(Valorant.Regions.Europe)
 // init db
 const db = new sqlite3.Database('valobot.db');
 db.run("CREATE TABLE IF NOT EXISTS users (id_discord TEXT NOT NULL, id_valorant TEXT NOT NULL, highest_rank TEXT NULL, date_time TEXT NOT NULL);");
-db.run("CREATE TABLE IF NOT EXISTS servers (id_server TEXT NOT NULL UNIQUE);");
 
 // init env variables
 const env = process.env;
@@ -35,11 +33,6 @@ module.exports.env = env;
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
     client.user.setActivity(`icebox`);
-
-    setInterval(function () {
-        Update.updateRankInDB();
-        Update.updateRoleInDiscord();
-     }, 60 * 60 * 1000);
 });
 
 client.on('message', msg => {
