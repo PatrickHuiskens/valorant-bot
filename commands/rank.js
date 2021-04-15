@@ -55,7 +55,6 @@ function sendRank(element, msg, playerId) {
 
     if(element.TierAfterUpdate >= 21){
         getLeaderboardRank(playerId).then(function(leaderboardRank) {
-            console.log(leaderboardRank);
             rankEmbed.addField('Current Leaderboard Rank: ', `${leaderboardRank}`);
             rankEmbed.addField('Current Rating: ', `${element.RankedRatingAfterUpdate}`);
             msg.channel.send(rankEmbed);
